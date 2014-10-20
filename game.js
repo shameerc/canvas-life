@@ -127,7 +127,7 @@ function Game(canvas) {
   /*
   * The game loop
   * Find the next generation
-  * Clar the canvas
+  * Clear the canvas
   * Draw the cells
   */
   this.gameLoop = function() {
@@ -173,13 +173,12 @@ function Game(canvas) {
 
 var types = {
   glider : [[10,10],[11,11],[12,11],[10,12],[11,12]],
-  oscillator: [[10,10],[10,11],[10,12]],
-  boat:[[10,10],[9,11],[11,11],[10,12],[11,12]],
-  something:[[10,10],[10,11],[10,12],[11,11],[12,11]]
+  oscillator: [[10,10],[10,11],[10,12]]
 }
 
 var game = new Game("canvas");
-game.start(types['something']);
+// Start the glider by default
+game.start(types['glider']);
 
 document.getElementById('life_type').onchange = function() {
   var type = this.value;
