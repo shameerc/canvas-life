@@ -1,0 +1,164 @@
+<html>
+  <head></head>
+  <body>
+    <style>
+    #canvas {
+      border:1px solid #ddd;
+      background: #fffff8;
+    }
+    </style>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <div>
+      <select name="type" id="life_type">
+        <option value="">Select</option>
+        <option value="glider">Glider</option>
+        <option value="oscillator">Oscillator</option>
+      </select>
+    </div>
+    <script>
+
+
+    function Cell(x, y, cellSize, life) {
+      this.x = x ;
+      this.y = y ;
+      this.radius = cellSize / 2;
+      this.cellSize = cellSize;
+      this.life = life;
+
+      this.draw = function(ctx){
+        ctx.fillStyle = 'orange';
+        ctx.beginPath();
+        ctx.arc(( 
+            this.x * this.cellSize) + this.radius
+          , (this.y * this.cellSize) + this.radius 
+          , this.radius
+          , 0
+          , 2 * Math.PI
+          , false
+        );
+        ctx.fill(); 
+      }
+    }
+    
+    function Game(canvas) {
+
+      this.canvas = document.getElementById(canvas);
+      this.ctx = this.canvas.getContext('2d');
+      this.current = []; 
+      this.CELL_SIZE = 10;
+      this.ALIVE = 1;
+      this.DEAD = 0;
+      this.SPEED = 500;
+      this.running = false;
+      var that = this;
+      var interval = null;
+
+      this.init = function(initalState) {
+        for(var i = 0; i < this.canvas.width/ this.CELL_SIZE; i++) {
+          this.current[i] = [];
+          for(var j = 0; j <this.canvas.height/this.CELL_SIZE; j++) {
+            this.current[i].push(new Cell(i, j, this.CELL_SIZE, this.DEAD));
+          }
+        }
+
+        initalState.forEach(function(coords){
+          if(that.current[coords[0]] &&
+            that.current[[coords[0]]][[coords[1]]]) {
+              that.current[[coords[0]]][[coords[1]]].life = that.ALIVE;
+          }
+        })
+      }
+
+      this.drawCells = function() {
+        this.current.forEach(function(row){
+          row.forEach(function(cell) {
+            if(cell.life == that.ALIVE){
+              cell.draw(that.ctx);
+            }
+          })
+        });
+      }
+
+
+      this.findNextStep = function() {
+        var next = this.current.map(function(row){
+          return row.map(function(cell){
+            var neighbours = that.countNeighbours(cell);
+            var life = ( (neighbours == 3 ) 
+                      || ( neighbours == 2 && cell.life == that.ALIVE )) ? that.ALIVE : that.DEAD;
+            return new Cell(cell.x, cell.y, that.CELL_SIZE, life)
+          });
+        });
+        this.current = next;
+      }
+
+      this.countNeighbours = function(cell) {
+        return [-1,0,1].map(function(row){
+          return [-1,0,1].reduce(function(val, j){
+            return ( 
+              (row == 0 && j==0)
+              || !that.current[cell.x + row]
+              || !that.current[cell.x + row][cell.y + j] )
+                ? val
+                : val + that.current[cell.x + row][cell.y + j].life
+          }, 0)
+        }).reduce(function(sum, i){
+          return sum+i;
+        },0);
+      }
+
+      this.clearCanvas = function() {
+        this.ctx.clearRect(0,0, this.canvas.height, this.canvas.height);
+      }
+
+      this.gameLoop = function() {
+        that.findNextStep();
+        that.clearCanvas();
+        that.drawCells();
+      }
+
+      this.start = function(initalState) {
+        this.stop();
+        this.running = true;
+        this.init(initalState);
+        that.clearCanvas();
+        that.drawCells();
+        interval = setInterval(this.gameLoop, that.SPEED);
+      }
+
+      this.continue = function() {
+        if(this.running == false) {
+          this.running = true;
+          interval = setInterval(this.gameLoop, that.SPEED);
+        }
+      }
+
+      this.stop = function() {
+        if(this.running == true) {
+          this.running = false;
+          clearInterval(interval);
+        }
+      }
+
+    }
+
+    var types = {
+      glider : [[10,10],[11,11],[12,11],[10,12],[11,12]],
+      oscillator: [[10,10],[10,11],[10,12]],
+      boat:[[10,10],[9,11],[11,11],[10,12],[11,12]]
+    }
+
+    var game = new Game("canvas");
+    game.start(types['glider']);
+
+    document.getElementById('life_type').onchange = function() {
+      var type = this.value;
+      if(type !="") {
+        game.stop();
+        game.start(types[type]);
+      }
+    }
+
+    </script>
+  </body>
+</html>
