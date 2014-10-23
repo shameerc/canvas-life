@@ -1,19 +1,43 @@
 <html>
-  <head></head>
+  <head>
+    <title>Demo : Canvas Life - Conway's Game of Life in JavaScript</title>
+  </head>
   <body>
     <style>
+    .container {
+      margin: 0 auto;
+      width: 600px;
+    }
+    .container h2, p, .github {
+      margin-top: 20px;
+      text-align: center;
+    }
     #canvas {
       border:1px solid #ddd;
       background: #fffff8;
     }
+    .type-selector {
+      margin-top: 10px;
+    }
     </style>
-    <canvas id="canvas" width="600" height="400"></canvas>
-    <div>
-      <select name="type" id="life_type">
-        <option value="">Select</option>
-        <option value="glider">Glider</option>
-        <option value="oscillator">Oscillator</option>
-      </select>
+    <div class="container">
+      <h2>Canvas Life - Demo</h2>
+      <p>A JavaScript implementation of <a target="_blank" href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Conway's game of life</a></p>
+      <p>Tip - Create a pattern and see how it is evolving</p>
+      <canvas id="canvas" width="600" height="400"></canvas>
+      <div class="type-selector">
+        <select name="type" id="life_type">
+          <option value="">Select Type</option>
+          <option value="glider">Glider</option>
+          <option value="oscillator">Oscillator</option>
+        </select>
+        <button id="clear">Clear</button>
+        <button id="record">Create Pattern</button>
+        <button id="endrecord">Play Pattern</button>
+      </div>
+    </div>
+    <div class="github">
+      View the source in <a target="_blank" href="https://www.github.com/shameerc/canvas-life">Github</a>
     </div>
     <script src="game.js"></script>
   </body>

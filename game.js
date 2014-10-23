@@ -36,8 +36,10 @@ function Game(canvas) {
   this.DEAD = 0;
   this.TICK = 500;
   this.running = false;
+  this.recording = false;
   var that = this;
   var interval = null;
+  this.recorded = [];
 
   /** 
   * Initialize the game. Prepare the initial grid
@@ -121,7 +123,7 @@ function Game(canvas) {
   * Clear canvas
   */
   this.clearCanvas = function() {
-    this.ctx.clearRect(0,0, this.canvas.height, this.canvas.height);
+    this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
   }
 
   /*
@@ -169,8 +171,79 @@ function Game(canvas) {
     }
   }
 
+  /*
+  * Clear the game, icluding cells
+  */
+  this.clear = function() {
+    this.clearCanvas();
+    this.current = [];
+  }
+
+  /**
+  * Draw a grid on the canvas
+  * For creating pattern
+  */
+  this.drawGrid = function() {
+    this.drawLine(this.canvas.width/2, 0, this.canvas.width, this.canvas.height);
+    this.drawLine(this.canvas.height/2, 0, this.canvas.width, this.canvas.height);
+
+    for(var i=this.CELL_SIZE; i < this.canvas.width; i += this.CELL_SIZE) {
+      this.drawLine(i, 0, i, this.canvas.height);
+    }
+
+    for (var j = this.CELL_SIZE; j < this.canvas.height; j += this.CELL_SIZE ) {
+      this.drawLine(0, j, this.canvas.width, j);
+    };
+  }
+
+  /**
+  * Draw a line on the canvas
+  * @param int startX x of start point
+  * @param int startY y of start point
+  * @param int endX x of end point
+  * @param int endY y of end point
+  */
+  this.drawLine = function(startX, startY, endX, endY) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(startX,startY);
+    this.ctx.lineTo(endX, endY);
+    this.ctx.stroke();
+  }
+  
+  /*
+  * Record a pattern
+  */
+  this.record = function(e) {
+    if(this.recording) {
+      var x = Math.floor(e.offsetX/that.CELL_SIZE);
+      var y = Math.floor(e.offsetY/that.CELL_SIZE);
+      var cell = new Cell(x, y, that.CELL_SIZE, that.ALIVE );
+      cell.draw(that.ctx);
+      that.recorded.push([x, y]);
+    }
+  }
+
+  /*
+  * Start recording the patterns
+  */
+  this.startRecording = function() {
+    that.recording = true;
+    that.recorded = [];
+    that.stop();
+    that.clear();
+    that.drawGrid();
+  }
+
+  /*
+  * End pattern recording
+  */
+  this.endRecording = function() {
+    that.recording = false;
+    that.start(this.recorded);
+  }
 }
 
+// Default types
 var types = {
   glider : [[10,10],[11,11],[12,11],[10,12],[11,12]],
   oscillator: [[10,10],[10,11],[10,12]]
@@ -186,4 +259,16 @@ document.getElementById('life_type').onchange = function() {
     game.stop();
     game.start(types[type]);
   }
+}
+document.getElementById("clear").onclick = function() {
+  game.clear();
+}
+document.getElementById("canvas").onclick = function(e) {
+  game.record(e);
+}
+document.getElementById("record").onclick = function() {
+  game.startRecording();
+}
+document.getElementById("endrecord").onclick = function() {
+  game.endRecording();
 }
