@@ -184,9 +184,7 @@ function Game(canvas) {
   * For creating pattern
   */
   this.drawGrid = function() {
-    this.drawLine(this.canvas.width/2, 0, this.canvas.width, this.canvas.height);
-    this.drawLine(this.canvas.height/2, 0, this.canvas.width, this.canvas.height);
-
+    
     for(var i=this.CELL_SIZE; i < this.canvas.width; i += this.CELL_SIZE) {
       this.drawLine(i, 0, i, this.canvas.height);
     }
